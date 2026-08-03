@@ -49,10 +49,11 @@
       <a class="btn btn-ghost" href="#demos">Demos</a>
     </div>
     <div class="hero-badges">
+      <span class="badge">v0.2.0 · GitHub Releases</span>
       <span class="badge">Java agent · no JAR rewrites</span>
-      <span class="badge">CVE importer · SCA → methods.json</span>
-      <span class="badge">HTML report + Slack</span>
-      <span class="badge">CI-friendly</span>
+      <span class="badge">Multi-module flat HTML merge</span>
+      <span class="badge">Slack on REACHABLE</span>
+      <span class="badge">Snyk → methods.json</span>
     </div>
   </header>
 
@@ -154,8 +155,9 @@
             <li>Attach with <code>-javaagent</code> — no dependency JAR rewrites</li>
             <li>Probe watchlist classes on load; report when methods <strong>run</strong></li>
             <li><code>[REACHABLE]</code> on first hit (stderr + stack)</li>
-            <li>HTML report on JVM exit · multi-module flat merge</li>
+            <li>HTML report on JVM exit · <strong>multi-module flat merge</strong> (sum hits by CVE+method)</li>
             <li>Optional Slack webhook on first hit + end-of-run summary</li>
+            <li>Latest agent: <code>radio-tracer-agent-0.2.0.jar</code></li>
           </ul>
           <div class="product-actions">
             <a class="btn btn-primary" href="https://github.com/radio-tracer/radio-tracer-java" target="_blank" rel="noopener">Java agent →</a>
@@ -546,25 +548,28 @@
       <p class="eyebrow">Quick start</p>
       <h2 class="section-title">End-to-end · Snyk → agent → evidence</h2>
       <p class="section-lead">
-        How you use RadioTracer on <strong>your</strong> app: download the release agent, build a watchlist from Snyk, attach with
+        How you use RadioTracer on <strong>your</strong> app: download agent
+        <strong>v0.2.0</strong> from GitHub Releases, build a watchlist from Snyk, attach with
         <code>-javaagent</code>, run your tests or service.
+        Multi-module Maven builds can share one report path — hits are merged flat by CVE+method.
       </p>
 
       <div class="term term-e2e" id="e2e-term">
         <div class="term-bar">
           <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
-          <span style="margin-left:0.5rem">e2e · release agent + your app</span>
+          <span style="margin-left:0.5rem">e2e · radio-tracer-agent 0.2.0 + your app</span>
         </div>
         <pre class="term-body term-e2e-body"><span class="dim"># ─────────────────────────────────────────────────────────────
-# RadioTracer — use on YOUR app
+# RadioTracer v0.2.0 — use on YOUR app
 # Requires: JDK 21+, Snyk CLI, Python 3.11+ (for the importer)
+# Release: https://github.com/radio-tracer/radio-tracer-java/releases/tag/v0.2.0
 # ─────────────────────────────────────────────────────────────
 
-# 1) Download the agent JAR from GitHub Releases
+# 1) Download the agent JAR from GitHub Releases (v0.2.0)
 #    https://github.com/radio-tracer/radio-tracer-java/releases
-#    (shaded agent · attach with -javaagent)</span>
+#    (shaded agent · multi-module flat HTML merge · Slack optional)</span>
 <span class="cmd">curl -fsSL -o radio-tracer-agent.jar \
-  https://github.com/radio-tracer/radio-tracer-java/releases/latest/download/radio-tracer-agent-0.1.0.jar</span>
+  https://github.com/radio-tracer/radio-tracer-java/releases/download/v0.2.0/radio-tracer-agent-0.2.0.jar</span>
 
 <span class="dim"># 2) SCA scan your project (Snyk — currently supported importer path)</span>
 <span class="cmd">snyk test --json &gt; snyk.json</span>
@@ -581,19 +586,21 @@
 # export RADIO_TRACER_SLACK_WEBHOOK=https://hooks.slack.com/services/T…/B…/…
 #    (or pass slack=… on the -javaagent= argument)
 
-# 5) Attach the agent to YOUR app / integration tests / Spring Boot jar</span>
+# 5) Attach the agent to YOUR app / integration tests / Spring Boot jar
+#    Multi-module: use the same report= path (or report dir) across modules —
+#    each JVM writes report.html.d/&lt;label&gt;-&lt;pid&gt;.json and merges a flat HTML.</span>
 <span class="cmd">java -javaagent:radio-tracer-agent.jar=\
 methods=methods.json,\
 report=./radio-tracer-report.html \
   -jar your-app.jar</span>
 
-<span class="dim">#    Maven Surefire / Failsafe example (tests as the workload):
-#    export MAVEN_OPTS="-javaagent:$PWD/radio-tracer-agent.jar=methods=methods.json,report=$PWD/radio-tracer-report.html"
+<span class="dim">#    Maven example (integration tests as the workload — prefer real call paths):
+#    export MAVEN_OPTS="-javaagent:$PWD/radio-tracer-agent.jar=methods=methods.json,report=$PWD/radio-tracer-report.html,label=${project.artifactId}"
 #    mvn -pl your-module verify
 
 # 6) Evidence
 #    · stderr: [REACHABLE] on first hit of a watched method (with stack)
-#    · HTML report written when the JVM exits
+#    · HTML report on JVM exit (flat multi-module merge when several JVMs share report=)
 #    · Slack (if configured) on first hit + summary
 #
 # REACHABLE = prioritize under this run.
@@ -613,7 +620,10 @@ report=./radio-tracer-report.html \
           RadioTracer is the Geiger counter — if the vulnerable method runs, you hear it.
         </p>
         <div class="hero-cta">
-          <a class="btn btn-primary" href="https://github.com/radio-tracer/radio-tracer-java" target="_blank" rel="noopener">
+          <a class="btn btn-primary" href="https://github.com/radio-tracer/radio-tracer-java/releases/tag/v0.2.0" target="_blank" rel="noopener">
+            Download v0.2.0
+          </a>
+          <a class="btn btn-ghost" href="https://github.com/radio-tracer/radio-tracer-java" target="_blank" rel="noopener">
             Java agent
           </a>
           <a class="btn btn-ghost" href="https://github.com/radio-tracer/radio-tracer-cve-import" target="_blank" rel="noopener">
