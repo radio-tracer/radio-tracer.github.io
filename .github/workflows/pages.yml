@@ -3,6 +3,8 @@ name: Deploy GitHub Pages
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -11,12 +13,35 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  # Required status check for main-protection (runs on PRs and main)
+  check:
+    name: Build & test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate site structure
+        run: |
+          set -euo pipefail
+          test -f index.html
+          test -f css/styles.css
+          test -f js/main.js
+          test -f assets/logo-icon.png
+          test -f assets/logo-vial.png
+          # basic sanity: page references its assets
+          grep -q 'css/styles.css' index.html
+          grep -q 'js/main.js' index.html
+          echo "Site structure OK"
+
   deploy:
     name: Deploy site
+    needs: check
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -31,7 +56,6 @@ jobs:
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Static site at repo root (exclude VCS metadata via checkout)
           path: .
 
       - name: Deploy to GitHub Pages
