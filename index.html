@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RadioTracer — Dynamic reachability for dependency CVEs</title>
+  <meta name="description" content="RadioTracer injects lightweight probes into your JVM and proves which vulnerable methods actually run under your workload. Pair with radio-tracer-cve-import for SCA → methods.json." />
+  <meta name="theme-color" content="#050a14" />
+  <link rel="icon" href="assets/logo-icon.png?v=2" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,650;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="nav-brand" href="#">
+        <img src="assets/logo-icon.png?v=2" alt="" width="32" height="48" />
+        <span>RadioTracer</span>
+      </a>
+      <div class="nav-links">
+        <a href="#derive" class="hide-sm">Derive</a>
+        <a href="#product" class="hide-sm">Product</a>
+        <a href="#how" class="hide-sm">How it works</a>
+        <a href="#support" class="hide-sm">Support</a>
+        <a href="#demos" class="hide-sm">Demos</a>
+        <a href="https://github.com/radio-tracer/radio-tracer-java" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn btn-primary" href="#start">Get started</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero container">
+    <div class="hero-brand">
+      <img class="hero-logo" src="assets/logo-icon.png?v=2" alt="" width="120" height="180" />
+      <div class="hero-wordmark">
+        <span class="hero-name">RadioTracer</span>
+        <span class="hero-tagline">Dynamic reachability analyzer</span>
+      </div>
+    </div>
+    <h1>Prove which CVEs are <em>actually reachable</em></h1>
+    <p class="hero-sub">
+      Like a medical radiotracer: inject a probe into your JVM, watch it travel the call path,
+      and light up when a vulnerable method runs under your real workload.
+    </p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="#derive">Why RadioTracer</a>
+      <a class="btn btn-ghost" href="#demos">Demos</a>
+    </div>
+    <div class="hero-badges">
+      <span class="badge">Java agent · no JAR rewrites</span>
+      <span class="badge">CVE importer · SCA → methods.json</span>
+      <span class="badge">HTML report + Slack</span>
+      <span class="badge">CI-friendly</span>
+    </div>
+  </header>
+
+  <!-- —— Derive (name + problem) —— -->
+  <section class="section" id="derive">
+    <div class="container">
+      <p class="eyebrow">Derive</p>
+      <h2 class="section-title">Where the idea comes from</h2>
+      <p class="section-lead">
+        In medicine and engineering, a <strong>radiotracer</strong> is a tiny probe you inject so you can see where something
+        <em>actually</em> goes — not where a map says it might go.
+      </p>
+
+      <div class="derive-grid">
+        <article class="derive-card">
+          <div class="derive-icon" aria-hidden="true">
+            <img src="assets/logo-vial.png?v=2" alt="" width="72" height="96" />
+          </div>
+          <h3>Radio</h3>
+          <p>
+            The signal — a known CVE / vulnerable method from your SCA inventory.
+            You choose what to watch; the agent does not invent CVE maps alone.
+          </p>
+        </article>
+        <article class="derive-card">
+          <div class="derive-icon" aria-hidden="true">
+            <img src="assets/logo-icon.png?v=2" alt="" width="56" height="84" />
+          </div>
+          <h3>Tracer</h3>
+          <p>
+            The agent injects a lightweight probe at class load and reports when that method
+            runs under your tests or app traffic — runtime evidence, not a graph guess.
+          </p>
+        </article>
+        <article class="derive-card highlight">
+          <div class="derive-stat">~88%</div>
+          <h3>SCA noise is real</h3>
+          <p>
+            Package scanners answer “is a vulnerable package on my tree?”
+            They do not answer “did my app run the vulnerable code?”
+            <strong class="text-red">Teams drown in alerts that never fire on their workload.</strong>
+          </p>
+          <p class="derive-note">Static reachability still misses reflection, DI, and frameworks. RadioTracer answers with a hit.</p>
+        </article>
+      </div>
+
+      <div class="derive-quote">
+        <p>
+          Package SCA is the inventory. Static graphs are the map.
+          <strong>RadioTracer is the Geiger counter</strong> — if the vulnerable method runs, you hear it.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- —— Product (agent + CVE importer) —— -->
+  <section class="section section-alt" id="product">
+    <div class="container">
+      <p class="eyebrow">The product</p>
+      <h2 class="section-title">Two tools. One reachability story.</h2>
+      <p class="section-lead">
+        RadioTracer is an umbrella: prepare a method-level watchlist from SCA, then prove which of those methods
+        actually execute under your JVM workload.
+      </p>
+
+      <div class="product-grid">
+        <article class="product-card">
+          <div class="product-top">
+            <img src="assets/logo-vial.png?v=2" alt="" width="48" height="64" class="product-logo" />
+            <div>
+              <span class="pill pill-cyan">Prep</span>
+              <h3>radio-tracer-cve-import</h3>
+              <p class="product-tag">SCA → methods.json · companion tool</p>
+            </div>
+          </div>
+          <ul class="product-list">
+            <li>Turn SCA findings into a method-level watchlist</li>
+            <li>Map packages / CVEs → concrete methods the agent can probe</li>
+            <li>Works with Snyk-style pipelines (and hand-written JSON)</li>
+            <li>Feeds the agent’s <code>methods=</code> argument</li>
+            <li>Optional — you can author <code>methods.json</code> yourself</li>
+          </ul>
+          <div class="product-actions">
+            <a class="btn btn-primary" href="https://github.com/radio-tracer/radio-tracer-cve-import" target="_blank" rel="noopener">CVE import →</a>
+            <a class="btn btn-ghost" href="#start">Pipeline snippet</a>
+          </div>
+        </article>
+
+        <article class="product-card">
+          <div class="product-top">
+            <img src="assets/logo-icon.png?v=2" alt="" width="48" height="72" class="product-logo" />
+            <div>
+              <span class="pill pill-blue">Runtime</span>
+              <h3>radio-tracer-java</h3>
+              <p class="product-tag">JVM agent · dynamic reachability</p>
+            </div>
+          </div>
+          <ul class="product-list">
+            <li>Attach with <code>-javaagent</code> — no dependency JAR rewrites</li>
+            <li>Probe watchlist classes on load; report when methods <strong>run</strong></li>
+            <li><code>[REACHABLE]</code> on first hit (stderr + stack)</li>
+            <li>HTML report on JVM exit · multi-module flat merge</li>
+            <li>Optional Slack webhook on first hit + end-of-run summary</li>
+          </ul>
+          <div class="product-actions">
+            <a class="btn btn-primary" href="https://github.com/radio-tracer/radio-tracer-java" target="_blank" rel="noopener">Java agent →</a>
+            <a class="btn btn-ghost" href="#how">How probes work</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="pipeline">
+        <div class="pipeline-step">
+          <span class="pipeline-n">1</span>
+          <strong>SCA scan</strong>
+          <span>Snyk · Trivy · OWASP DC…</span>
+        </div>
+        <div class="pipeline-arrow" aria-hidden="true">→</div>
+        <div class="pipeline-step">
+          <span class="pipeline-n">2</span>
+          <strong>CVE import</strong>
+          <span>methods.json watchlist</span>
+        </div>
+        <div class="pipeline-arrow" aria-hidden="true">→</div>
+        <div class="pipeline-step">
+          <span class="pipeline-n">3</span>
+          <strong>Java agent</strong>
+          <span>probes under tests / app</span>
+        </div>
+        <div class="pipeline-arrow" aria-hidden="true">→</div>
+        <div class="pipeline-step">
+          <span class="pipeline-n">4</span>
+          <strong>Evidence</strong>
+          <span>REACHABLE · HTML · Slack</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- —— How it works (tracer diagram) —— -->
+  <section class="section" id="how">
+    <div class="container">
+      <p class="eyebrow">How it works</p>
+      <h2 class="section-title">Inject · traverse · light up</h2>
+      <p class="section-lead">
+        Components as a system diagram. A needle injects the tracer, follows the call path through the importer
+        and agent, then turns a box <strong class="text-red">red</strong> when a watched method runs — that is REACHABLE.
+      </p>
+
+      <div class="diagram-wrap">
+        <div class="diagram-head">
+          <div>
+            <h2>Runtime probe · medical radiotracer model</h2>
+            <p>
+              SCA → <strong>cve-import</strong> → methods.json → agent → your code path → vulnerable method → report.
+            </p>
+          </div>
+          <div class="diagram-controls">
+            <button type="button" class="btn btn-primary" id="btn-inject">Inject tracer</button>
+            <button type="button" class="btn btn-ghost" id="btn-reset">Reset</button>
+          </div>
+        </div>
+
+        <svg class="diagram-svg" id="tracer-svg" viewBox="0 0 1000 440" role="img" aria-label="RadioTracer architecture diagram with animated probe">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#3a4f73" />
+            </marker>
+            <marker id="arrow-active" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#22d3ee" />
+            </marker>
+            <filter id="glow-cyan" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3" result="b" />
+              <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+            <linearGradient id="needle-grad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#94a3b8" />
+              <stop offset="55%" stop-color="#e2e8f0" />
+              <stop offset="100%" stop-color="#22d3ee" />
+            </linearGradient>
+          </defs>
+
+          <!-- Edges -->
+          <path class="edge" id="e0" d="M 130 70 L 175 70" marker-end="url(#arrow)" />
+          <path class="edge" id="e1" d="M 325 70 L 370 70" marker-end="url(#arrow)" />
+          <path class="edge" id="e2" d="M 520 70 L 575 70" marker-end="url(#arrow)" />
+          <path class="edge" id="e3" d="M 650 110 L 650 155" marker-end="url(#arrow)" />
+          <path class="edge" id="e4" d="M 570 200 L 440 200" marker-end="url(#arrow)" />
+          <path class="edge" id="e5" d="M 300 240 L 300 290" marker-end="url(#arrow)" />
+          <path class="edge" id="e6" d="M 380 330 L 560 330" marker-end="url(#arrow)" />
+          <path class="edge" id="e-side" d="M 720 90 L 820 90 L 820 200" marker-end="url(#arrow)" opacity="0.4" />
+
+          <!-- Nodes -->
+          <g data-node="sca">
+            <rect class="node" id="n-sca" x="30" y="35" width="100" height="70" rx="12" />
+            <text class="node-label" x="80" y="65" text-anchor="middle">SCA scan</text>
+            <text class="node-sub" x="80" y="83" text-anchor="middle">Snyk · Trivy</text>
+          </g>
+
+          <g data-node="importer">
+            <rect class="node" id="n-importer" x="175" y="30" width="150" height="80" rx="12" />
+            <text class="node-label" x="250" y="58" text-anchor="middle">CVE importer</text>
+            <text class="node-sub" x="250" y="76" text-anchor="middle">radio-tracer-</text>
+            <text class="node-sub" x="250" y="90" text-anchor="middle">cve-import</text>
+          </g>
+
+          <g data-node="watchlist">
+            <rect class="node" id="n-watchlist" x="370" y="35" width="150" height="70" rx="12" />
+            <text class="node-label" x="445" y="65" text-anchor="middle">methods.json</text>
+            <text class="node-sub" x="445" y="83" text-anchor="middle">CVE → method map</text>
+          </g>
+
+          <g data-node="agent">
+            <rect class="node" id="n-agent" x="575" y="30" width="145" height="80" rx="12" />
+            <text class="node-label" x="647" y="58" text-anchor="middle">Java agent</text>
+            <text class="node-sub" x="647" y="76" text-anchor="middle">-javaagent:…</text>
+            <text class="node-sub" x="647" y="92" text-anchor="middle">probe inject</text>
+          </g>
+
+          <g data-node="app">
+            <rect class="node" id="n-app" x="570" y="160" width="160" height="80" rx="12" />
+            <text class="node-label" x="650" y="192" text-anchor="middle">Your app / tests</text>
+            <text class="node-sub" x="650" y="210" text-anchor="middle">workload traffic</text>
+          </g>
+
+          <g data-node="svc">
+            <rect class="node" id="n-svc" x="300" y="160" width="140" height="80" rx="12" />
+            <text class="node-label" x="370" y="192" text-anchor="middle">OrderService</text>
+            <text class="node-sub" x="370" y="210" text-anchor="middle">business logic</text>
+          </g>
+
+          <g data-node="vuln">
+            <rect class="node" id="n-vuln" x="230" y="290" width="150" height="80" rx="12" />
+            <text class="node-label" x="305" y="322" text-anchor="middle">DeserUtil#read</text>
+            <text class="node-sub" x="305" y="340" text-anchor="middle">CVE-202X-XXXX</text>
+          </g>
+
+          <g data-node="report">
+            <rect class="node" id="n-report" x="560" y="290" width="150" height="80" rx="12" />
+            <text class="node-label" x="635" y="322" text-anchor="middle">HTML report</text>
+            <text class="node-sub" x="635" y="340" text-anchor="middle">+ stderr + Slack</text>
+          </g>
+
+          <g data-node="cache">
+            <rect class="node" id="n-cache" x="760" y="200" width="120" height="70" rx="12" opacity="0.65" />
+            <text class="node-label" x="820" y="230" text-anchor="middle" opacity="0.75">Cache layer</text>
+            <text class="node-sub" x="820" y="248" text-anchor="middle" opacity="0.75">not on path</text>
+          </g>
+
+          <g id="probe" class="probe probe-hidden" transform="translate(0,0)">
+            <rect x="-6" y="-28" width="12" height="22" rx="2" fill="url(#needle-grad)" stroke="#64748b" stroke-width="0.8" />
+            <rect x="-8" y="-32" width="16" height="5" rx="1" fill="#cbd5e1" />
+            <polygon points="0,0 -2.5,-8 2.5,-8" fill="#22d3ee" />
+            <line x1="0" y1="-8" x2="0" y2="-28" stroke="#94a3b8" stroke-width="1.2" />
+            <circle id="probe-ring" cx="0" cy="0" r="8" fill="none" stroke="#22d3ee" stroke-width="1.5" opacity="0.6">
+              <animate attributeName="r" values="6;14;6" dur="1.2s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.7;0;0.7" dur="1.2s" repeatCount="indefinite" />
+            </circle>
+          </g>
+          <circle id="trail-dot" r="4" fill="#22d3ee" opacity="0" filter="url(#glow-cyan)" />
+        </svg>
+
+        <div class="diagram-status" id="diagram-status">
+          Idle — click <span class="ok">Inject tracer</span> to watch a probe travel the call path.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- —— Demos —— -->
+  <section class="section section-alt" id="demos">
+    <div class="container">
+      <p class="eyebrow">Demos</p>
+      <h2 class="section-title">See it in action</h2>
+      <p class="section-lead">
+        Two interactive demos — same agent, different surfaces. No backend required; everything runs in your browser.
+      </p>
+
+      <div class="demo-grid">
+        <article class="demo-card" id="demo-slack">
+          <header>
+            <div>
+              <h3>Live app · click → Slack alert</h3>
+              <p>A busy finance console. Click “Import orders” — the agent fires and Slack lights up.</p>
+            </div>
+            <button type="button" class="btn btn-ghost" id="btn-demo-slack">Replay</button>
+          </header>
+          <div class="demo-body">
+            <div class="demo-split">
+              <div class="fake-app" id="fake-app">
+                <div class="fake-titlebar">
+                  <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+                  <span class="fake-title">Acme Finance · Operations Console</span>
+                </div>
+                <div class="fake-layout">
+                  <aside class="fake-sidebar">
+                    <span class="fake-nav">Dashboard</span>
+                    <span class="fake-nav active">Orders</span>
+                    <span class="fake-nav">Customers</span>
+                    <span class="fake-nav">Settlements</span>
+                    <span class="fake-nav">Reports</span>
+                    <span class="fake-nav">Admin</span>
+                  </aside>
+                  <div class="fake-main">
+                    <div class="fake-toolbar">
+                      <span class="chip">Q3 batch</span>
+                      <span class="chip">Region: NA</span>
+                      <span class="chip">Status: 12 pending</span>
+                      <span class="chip">Latency p99: 48ms</span>
+                    </div>
+                    <table class="fake-table">
+                      <thead>
+                        <tr><th>Order</th><th>Merchant</th><th>Amount</th><th>State</th></tr>
+                      </thead>
+                      <tbody>
+                        <tr><td>ORD-9182</td><td>Northwind</td><td>$4,120.00</td><td>Queued</td></tr>
+                        <tr><td>ORD-9183</td><td>Contoso</td><td>$890.50</td><td>Queued</td></tr>
+                        <tr><td>ORD-9184</td><td>Fabrikam</td><td>$12,004.00</td><td>Review</td></tr>
+                        <tr><td>ORD-9185</td><td>Adventure</td><td>$330.00</td><td>Queued</td></tr>
+                        <tr><td>ORD-9186</td><td>Tailspin</td><td>$2,450.75</td><td>Queued</td></tr>
+                      </tbody>
+                    </table>
+                    <div class="fake-actions">
+                      <button type="button" class="fake-btn primary" id="btn-import">Import orders</button>
+                      <button type="button" class="fake-btn ghost" disabled>Export CSV</button>
+                      <button type="button" class="fake-btn ghost" disabled>Refresh</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="cursor" id="demo-cursor" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M4 3l16 8.5-7 1.5-2.5 7L4 3z" fill="#fff" stroke="#0f172a" stroke-width="1.2" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+
+              <div class="slack-panel" id="slack-panel">
+                <div class="slack-header">
+                  <img src="assets/logo-icon.png?v=2" alt="" width="18" height="27" style="height:18px;width:auto" />
+                  RadioTracer
+                  <span class="hash">#security-alerts</span>
+                </div>
+                <div class="slack-msgs" id="slack-msgs">
+                  <div class="slack-empty" id="slack-empty">
+                    Waiting for first REACHABLE hit…<br />
+                    <span style="font-size:0.78rem;opacity:0.8">Webhook quiet until a watched method runs</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="demo-card" id="demo-ci">
+          <header>
+            <div>
+              <h3>Integration test · logs + HTML report</h3>
+              <p>CI runs with the agent attached. Watch stderr for [REACHABLE], then the HTML artifact.</p>
+            </div>
+            <button type="button" class="btn btn-ghost" id="btn-demo-ci">Run test</button>
+          </header>
+          <div class="demo-body">
+            <div class="demo-split">
+              <div class="term" id="term">
+                <div class="term-bar">
+                  <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+                  <span style="margin-left:0.5rem">ci · radio-tracer-it · junit</span>
+                </div>
+                <div class="term-body" id="term-body"><span class="dim">$ ready — click “Run test”</span></div>
+              </div>
+
+              <div class="report-preview" id="report-preview">
+                <div class="rp-top">
+                  <strong>radio-tracer-report.html</strong>
+                  <span class="muted" id="rp-status">pending…</span>
+                </div>
+                <div class="rp-body" id="rp-body">
+                  <p class="muted" style="margin:2rem 0;text-align:center">
+                    Report appears when the JVM exits after the test run.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- —— Features —— -->
+  <section class="section" id="features">
+    <div class="container">
+      <p class="eyebrow">Features</p>
+      <h2 class="section-title">Built for signal, not noise</h2>
+      <p class="section-lead">
+        SCA tells you what’s on the tree. The importer builds the watchlist. The agent tells you what actually ran.
+      </p>
+      <div class="features">
+        <div class="feature">
+          <div class="icon">💉</div>
+          <h3>Runtime probes</h3>
+          <p>Lightweight Java agent instruments watchlist classes on load. No dependency JAR rewrites on disk.</p>
+        </div>
+        <div class="feature">
+          <div class="icon">🧪</div>
+          <h3>CVE → method import</h3>
+          <p>Companion <code>radio-tracer-cve-import</code> turns SCA output into a probeable methods.json watchlist.</p>
+        </div>
+        <div class="feature">
+          <div class="icon">🔴</div>
+          <h3>REACHABLE on first hit</h3>
+          <p>First invocation of a watched method logs instantly on stderr with stack — prioritize while the run is live.</p>
+        </div>
+        <div class="feature">
+          <div class="icon">📄</div>
+          <h3>HTML report on exit</h3>
+          <p>Multi-module fragments merge into one flat report with hit counts by CVE + method. CI-friendly artifact.</p>
+        </div>
+        <div class="feature">
+          <div class="icon">💬</div>
+          <h3>Slack on first hit</h3>
+          <p>Optional webhook: notify #security when a critical path lights up, plus an end-of-run summary.</p>
+        </div>
+        <div class="feature">
+          <div class="icon">🧩</div>
+          <h3>SCA-agnostic</h3>
+          <p>Bring any methods.json — generated by the importer or hand-written. Agent stays SCA-tool independent.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- —— Support matrix —— -->
+  <section class="section" id="support">
+    <div class="container">
+      <p class="eyebrow">Support</p>
+      <h2 class="section-title">Scanners &amp; runtimes</h2>
+      <p class="section-lead">
+        The agent is SCA-agnostic at the <code>methods.json</code> boundary.
+        The importer currently ships a <strong>Snyk</strong> path; more scanners are adapter work.
+        Runtime coverage today is the <strong>JVM family</strong> — one agent for any language that runs as bytecode.
+      </p>
+      <div class="support-grid">
+        <div class="support-card">
+          <h3>SCA scanners</h3>
+          <ul class="support-list">
+            <li>
+              <span class="support-name">Snyk</span>
+              <span class="support-badge on">Supported</span>
+              <span class="support-note">via radio-tracer-cve-import → methods.json</span>
+            </li>
+            <li>
+              <span class="support-name">Trivy · OWASP DC · Dependabot · OSV</span>
+              <span class="support-badge soon">Coming</span>
+              <span class="support-note">importer adapters (same methods.json shape)</span>
+            </li>
+            <li>
+              <span class="support-name">Hand-written methods.json</span>
+              <span class="support-badge on">Supported</span>
+              <span class="support-note">any SCA · agent accepts the watchlist directly</span>
+            </li>
+          </ul>
+        </div>
+        <div class="support-card">
+          <h3>Programming languages / runtimes</h3>
+          <ul class="support-list">
+            <li>
+              <span class="support-name">Java</span>
+              <span class="support-badge on">Supported</span>
+              <span class="support-note">-javaagent · ByteBuddy · JDK 21+</span>
+            </li>
+            <li>
+              <span class="support-name">Kotlin</span>
+              <span class="support-badge on">Supported</span>
+              <span class="support-note">same agent · JVM bytecode</span>
+            </li>
+            <li>
+              <span class="support-name">Scala · Groovy · Clojure</span>
+              <span class="support-badge on">Supported</span>
+              <span class="support-note">same agent when methods run on the JVM</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- —— Quick start —— -->
+  <section class="section section-alt" id="start">
+    <div class="container">
+      <p class="eyebrow">Quick start</p>
+      <h2 class="section-title">End-to-end · Snyk → agent → evidence</h2>
+      <p class="section-lead">
+        How you use RadioTracer on <strong>your</strong> app: download the release agent, build a watchlist from Snyk, attach with
+        <code>-javaagent</code>, run your tests or service.
+      </p>
+
+      <div class="term term-e2e" id="e2e-term">
+        <div class="term-bar">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          <span style="margin-left:0.5rem">e2e · release agent + your app</span>
+        </div>
+        <pre class="term-body term-e2e-body"><span class="dim"># ─────────────────────────────────────────────────────────────
+# RadioTracer — use on YOUR app
+# Requires: JDK 21+, Snyk CLI, Python 3.11+ (for the importer)
+# ─────────────────────────────────────────────────────────────
+
+# 1) Download the agent JAR from GitHub Releases
+#    https://github.com/radio-tracer/radio-tracer-java/releases
+#    (shaded agent · attach with -javaagent)</span>
+<span class="cmd">curl -fsSL -o radio-tracer-agent.jar \
+  https://github.com/radio-tracer/radio-tracer-java/releases/latest/download/radio-tracer-agent-0.1.0.jar</span>
+
+<span class="dim"># 2) SCA scan your project (Snyk — currently supported importer path)</span>
+<span class="cmd">snyk test --json &gt; snyk.json</span>
+
+<span class="dim"># 3) Install the CVE importer, then build a method-level watchlist
+#    https://github.com/radio-tracer/radio-tracer-cve-import</span>
+<span class="cmd">pip install "git+https://github.com/radio-tracer/radio-tracer-cve-import.git"</span>
+<span class="cmd">radio-tracer-cve-import \
+  --source snyk \
+  -i snyk.json \
+  -o methods.json</span>
+
+<span class="dim"># 4) Optional Slack on first REACHABLE + end-of-run summary
+# export RADIO_TRACER_SLACK_WEBHOOK=https://hooks.slack.com/services/T…/B…/…
+#    (or pass slack=… on the -javaagent= argument)
+
+# 5) Attach the agent to YOUR app / integration tests / Spring Boot jar</span>
+<span class="cmd">java -javaagent:radio-tracer-agent.jar=\
+methods=methods.json,\
+report=./radio-tracer-report.html \
+  -jar your-app.jar</span>
+
+<span class="dim">#    Maven Surefire / Failsafe example (tests as the workload):
+#    export MAVEN_OPTS="-javaagent:$PWD/radio-tracer-agent.jar=methods=methods.json,report=$PWD/radio-tracer-report.html"
+#    mvn -pl your-module verify
+
+# 6) Evidence
+#    · stderr: [REACHABLE] on first hit of a watched method (with stack)
+#    · HTML report written when the JVM exits
+#    · Slack (if configured) on first hit + summary
+#
+# REACHABLE = prioritize under this run.
+# No hit = not observed here — not “safe.”</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- —— CTA —— -->
+  <section class="section">
+    <div class="container">
+      <div class="cta">
+        <img src="assets/logo-icon.png?v=2" alt="" width="64" height="96" class="cta-logo" />
+        <h2>Stop drowning in unreachable CVEs</h2>
+        <p>
+          Package SCA is the inventory. The importer builds the map of methods.
+          RadioTracer is the Geiger counter — if the vulnerable method runs, you hear it.
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="https://github.com/radio-tracer/radio-tracer-java" target="_blank" rel="noopener">
+            Java agent
+          </a>
+          <a class="btn btn-ghost" href="https://github.com/radio-tracer/radio-tracer-cve-import" target="_blank" rel="noopener">
+            CVE import
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div style="display:flex;align-items:center;gap:0.6rem">
+        <img src="assets/logo-icon.png?v=2" alt="" width="28" height="42" style="height:28px;width:auto" />
+        <span>RadioTracer · Apache 2.0 · early preview</span>
+      </div>
+      <div style="display:flex;gap:1.25rem;flex-wrap:wrap">
+        <a href="https://github.com/radio-tracer/radio-tracer-java">Java agent</a>
+        <a href="https://github.com/radio-tracer/radio-tracer-cve-import">CVE import</a>
+        <a href="#derive">Derive</a>
+        <a href="#how">How it works</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js" defer></script>
+</body>
+</html>
